@@ -21,7 +21,7 @@
 # Everything in this directory will become public
 
 # Proprietary
-$(call inherit-product-if-exists, vendor/lge/mako/device-vendor.mk)
+$(call inherit-product-if-exists, vendor/lge/mako/mako-vendor.mk)
 
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
