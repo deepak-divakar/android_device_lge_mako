@@ -1,0 +1,2 @@
+# /dev/hsicctl* node access
+allow qmuxd radio_device:chr_file rw_file_perms;

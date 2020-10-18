@@ -739,6 +739,7 @@ void QCameraHardwareInterface::processCtrlEvent(mm_camera_ctrl_event_t *event, a
           app_cb->argm_notify.ext2 = true;
           app_cb->argm_notify.cookie =  mCallbackCookie;
           mShutterSoundPlayed = true;
+          break;
        default:
             break;
     }

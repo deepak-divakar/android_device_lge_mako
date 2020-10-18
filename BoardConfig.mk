@@ -1,6 +1,6 @@
 #
 # Copyright (C) 2011 The Android Open-Source Project
-# Copyright (C) 2017-2018 The LineageOS Project
+# Copyright (C) 2017-2019 The LineageOS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
 TARGET_ARCH := arm
 TARGET_ARCH_VARIANT := armv7-a-neon
-TARGET_CPU_VARIANT := krait
+TARGET_CPU_VARIANT := generic
+TARGET_CPU_VARIANT_RUNTIME := krait
 
 # Kernel
 BOARD_KERNEL_BASE := 0x80200000
@@ -47,24 +48,29 @@ TARGET_BOOTLOADER_NAME := mako
 # Binder API version
 TARGET_USES_64_BIT_BINDER := true
 
+# Security patch level
+VENDOR_SECURITY_PATCH := 2015-09-08
+
 # QCOM hardware
 BOARD_USES_QCOM_HARDWARE := true
 
 # Audio
+AUDIO_FEATURE_ENABLED_FLUENCE := true
 BOARD_USES_ALSA_AUDIO := true
-BOARD_USES_LEGACY_ALSA_AUDIO := false
-BOARD_USES_FLUENCE_INCALL := true
-BOARD_USES_SEPERATED_AUDIO_INPUT := true
-
-# AOSP Audio Variant (TODO: Switch to CAF variant)
-USE_DEVICE_SPECIFIC_AUDIO := true
-DEVICE_SPECIFIC_AUDIO_PATH := hardware/qcom/audio/default
+AUDIO_USE_LL_AS_PRIMARY_OUTPUT := true
+USE_CUSTOM_AUDIO_POLICY := 1
 
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_QCOM := true
 BLUETOOTH_HCI_USE_MCT := true
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := $(PLATFORM_PATH)/bluetooth
+
+# WCNSS
+TARGET_USES_QCOM_WCNSS_QMI := true
+TARGET_PROVIDES_WCNSS_QMI := true
+TARGET_DISABLE_WCNSS_CONFIG_COPY := true
+PRODUCT_VENDOR_MOVE_ENABLED := true
 
 # Wi-Fi
 BOARD_HAS_QCOM_WLAN := true
@@ -78,33 +84,27 @@ WIFI_DRIVER_FW_PATH_STA := "sta"
 WIFI_DRIVER_FW_PATH_AP  := "ap"
 
 # Display
-TARGET_USES_ION := true
-TARGET_DISPLAY_USE_RETIRE_FENCE := true
-OVERRIDE_RS_DRIVER := libRSDriver_adreno.so
+TARGET_SCREEN_DENSITY := 320
 
-# Lights
-TARGET_PROVIDES_LIBLIGHT := true
+# Graphics
+TARGET_USES_ION := true
+TARGET_ADDITIONAL_GRALLOC_10_USAGE_BITS := 0x2000U | 0x02000000U
 
 # Dexpreopt
-ifeq ($(HOST_OS),linux)
-  ifneq ($(TARGET_BUILD_VARIANT),eng)
-    ifeq ($(WITH_DEXPREOPT),)
-      WITH_DEXPREOPT := true
-      WITH_DEXPREOPT_BOOT_IMG_AND_SYSTEM_SERVER_ONLY := true
-    endif
-  endif
-endif
+WITH_DEXPREOPT_BOOT_IMG_AND_SYSTEM_SERVER_ONLY := true
+WITH_DEXPREOPT_DEBUG_INFO := false
 
 # Filesystem
+TARGET_FS_CONFIG_GEN := $(PLATFORM_PATH)/config.fs
 TARGET_USERIMAGES_USE_EXT4 := true
-TARGET_USERIMAGES_USE_F2FS := true
 BOARD_BOOTIMAGE_PARTITION_SIZE := 23068672 # 22M
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 23068672 # 22M
-BOARD_SYSTEMIMAGE_PARTITION_SIZE := 880803840 # 840M
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1333788672 # 1272M
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 6189744128 # 5.9G
 BOARD_CACHEIMAGE_PARTITION_SIZE := 738197504 # 704 MByte
 BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_FLASH_BLOCK_SIZE := 131072 # (BOARD_KERNEL_PAGESIZE * 64)
+BOARD_ROOT_EXTRA_FOLDERS := firmware persist
 
 # Reduce space taken by the journal
 BOARD_SYSTEMIMAGE_JOURNAL_SIZE := 0
@@ -114,42 +114,30 @@ BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := $(TARGET_BOARD_PLATFORM)
 TARGET_NO_RPC := true
 BOARD_VENDOR_QCOM_LOC_PDK_FEATURE_SET := true
 
-# Misc
-BOARD_USES_SECURE_SERVICES := true
-BOARD_USES_EXTRA_THERMAL_SENSOR := true
-BOARD_USES_CAMERA_FAST_AUTOFOCUS := true
-BOARD_CHARGER_ENABLE_SUSPEND := true
+# Release tools
+TARGET_RELEASETOOLS_EXTENSIONS := $(PLATFORM_PATH)
 
 # SeLinux Policy
+include device/qcom/sepolicy-legacy/sepolicy.mk
 BOARD_SEPOLICY_DIRS += $(PLATFORM_PATH)/sepolicy
 
 # Camera
-USE_DEVICE_SPECIFIC_CAMERA := true
-USE_DEVICE_SPECIFIC_QCOM_PROPRIETARY := true
+TARGET_PROCESS_SDK_VERSION_OVERRIDE := \
+    /system/bin/cameraserver=22 \
+    /system/bin/mediaserver=22 \
+    /system/vendor/bin/mm-qcamera-daemon=22
 
 # Text Relocations
 TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS := true
 
-# QCOM Media Extensions
-TARGET_USES_MEDIA_EXTENSIONS := true
+# Healthd
+BOARD_CHARGER_ENABLE_SUSPEND := true
 
-# LineageOS Hardware
-BOARD_HARDWARE_CLASS := $(PLATFORM_PATH)/lineagehw/
+# Exclude serif fonts for saving system.img size.
+EXCLUDE_SERIF_FONTS := true
 
 # Recovery
-# RECOVERY_VARIANT := twrp
-
-ifeq ($(RECOVERY_VARIANT),twrp)
-TARGET_RECOVERY_FSTAB := $(PLATFORM_PATH)/rootdir/recovery/twrp.fstab
-BOARD_HAS_NO_REAL_SDCARD := true
-TW_THEME := portrait_hdpi
-RECOVERY_SDCARD_ON_DATA := true
-TW_INPUT_BLACKLIST := "hbtp_vm"
-TW_EXTRA_LANGUAGES := true
-TW_INCLUDE_CRYPTO := true
-else
-TARGET_RECOVERY_FSTAB := $(PLATFORM_PATH)/rootdir/recovery/fstab.mako
-endif
+TARGET_RECOVERY_FSTAB := $(PLATFORM_PATH)/rootdir/etc/fstab.mako
 
 # Device manifest
 DEVICE_MANIFEST_FILE := $(PLATFORM_PATH)/manifest.xml

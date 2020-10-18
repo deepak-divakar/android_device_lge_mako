@@ -1,4 +1,17 @@
-allow init tmpfs:lnk_file create_file_perms;
-allow init debugfs:file w_file_perms;
-allow init power_control_device:file rw_file_perms;
-allow init sysfs_hardware:file rw_file_perms;
+# Symlink /sdcard to backing block
+allow init tmpfs:lnk_file create;
+
+allow init {
+    sysfs_devices_system_cpu
+    sysfs_mpdecision
+    sysfs_msm_subsys
+    sysfs_net
+}:file w_file_perms;
+
+allow init {
+    proc_slabinfo
+    sysfs_graphics
+    sysfs_msm_subsys
+    sysfs_usb
+    sysfs_wlan_fwpath
+}:file setattr;
