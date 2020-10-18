@@ -1,5 +1,7 @@
 #
 # Copyright (C) 2018-2019 The LineageOS Project
+# Copyright 2015-2016 Preetam J. D'Souza
+# Copyright 2016 The Maru OS Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +19,10 @@
 PRODUCT_MAKEFILES := \
     $(LOCAL_DIR)/lineage_mako.mk
 
+PRODUCT_MAKEFILES += \
+    $(LOCAL_DIR)/maru_mako.mk
+
 COMMON_LUNCH_CHOICES := \
     lineage_mako-user \
-    lineage_mako-userdebug \
-    lineage_mako-eng
+    maru_mako-userdebug \
+    maru_mako-eng
